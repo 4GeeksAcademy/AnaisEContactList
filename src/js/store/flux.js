@@ -12,7 +12,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			apiUrl: "https://playground.4geeks.com/contact",
+			agendaSlug: "Anais",
+			contacts: [],
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -37,7 +40,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
-			}
+			},
+			createAgenda: async () => {
+				const store = getStore()
+				const response = await fetch(store.apiUrl+"/agendas/"+store.agendaSlug, {method: "POST"})
+
+				if (response.ok) {
+					const data = await response.json()
+					console.log(data)
+				}
+			},
+			getContacts: async () => {
+				const store = getStore()
+				const actions = getActions()
+				const response = await fetch(store.apiUrl+"/agendas/"+store.agendaSlug+"/contacts")
+
+				if(response.status==404) {
+					actions.createAgenda()
+				}
+				if (response.ok) {
+					const data = await response.json()
+					setStore({contacts: data.contacts})
+					console.log(data)
+				}
+			},
 		}
 	};
 };
